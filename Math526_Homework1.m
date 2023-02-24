@@ -1,48 +1,60 @@
 clear all;
+
+%Loading in data for problem
 load('streambed_data.mat')
 
-%mean value
-mean_func= @(z) exp(-(z.^2./500)).*(-30/sqrt(pi));
+%Defining anonymous function for the mean
+mean_func=@(z) exp(-(z.^2./500)).*(-30/sqrt(pi));
 
-%parameters
+%Definining lambda and l
 lambda=0.25;
-l=0.25;
-%generate points 
-test_pnts = linspace(-100,100,125);
-%quadratic
-q = @(x,y) lambda^2*exp(-(x-y).^2/(2*l^2));
-%error
-err = @(d) d.^2;
-%Covariance matrix being passed
+l=0.001;
+
+%Generating Test Points
+test_pnts=linspace(-100,100,125);
+
+%Definining anonymous function for quadratic exponential
+q=@(x,y) lambda^2*exp(-(x-y).^2/(2*l^2));
+
+%Defining anonymous function for error 
+err=@(d) d.^2;
+
+%%Section below is for computing the prior
+
+%Calculating covariance matrix for the prior
 for i=1:length(test_pnts)
     for j=1:length(test_pnts)
         v(i,j)=q(test_pnts(i),test_pnts(j));
     end
 end
 
-%[U,S,∼] was the ~ symbol to just show it is an irrelevant value?
-[U,S]=svd(v); 
-L=U*sqrt(S);
+%Performing SVD to obtain L for the prior
+[mu,S]=svd(v); 
+L=mu*sqrt(S);
 
-%Drawing Monte Carlo Samples, how would you draw the samples?
+%Calculating mean for the prior
 for i=1:length(test_pnts)
     f(i,1)=normrnd(0,sqrt(1));
     mean_prior(i,1)=mean_func(test_pnts(i));
-
-   %r(:,i) = mean + L * f;
 end
 
+%Monte Carlo Sample for the prior
 r_prior=mean_prior + L * f;
-%r_post=mean_post + L * f;
 
-
+%Generates figure for the input data and prior
 figure()
 hold on
-plot(test_pnts,r_prior)
-errorbar(x,y,d,'o')
+title('Input Data vs Prior')
+ylabel('Output (y)')
+xlabel('Input (x)')
+errorbar(x,y,d,'o','Color','red')
+plot(test_pnts,r_prior,'-o','Color','blue')
+legend('Input Data','Prior')
 hold off
 
-%Posterior
+%%Section below is for computing the posterior
+
+%Computing matrices for the posterior calculation
 for i=1:length(test_pnts)
     for j=1:length(x)
         c_star_sharp(i,j)=q(test_pnts(i),x(j));
@@ -52,31 +64,34 @@ for i=1:length(test_pnts)
     end
 end
 
-%Calculating Covariance Matrix Posterior
+%Computing the covariance matrix 
 g_star_sharp=c_star_sharp*(c_sharp_sharp+v_sharp_sharp)^-1;
-post_v= v - g_star_sharp*c_sharp_star;
-[U_post,S_post,trash]=svd(post_v); 
+post_v= v-g_star_sharp*c_sharp_star;
+
+%Performing SVD to obtain L for the posterior
+[U_post,S_post]=svd(post_v); 
 L_post=U_post*sqrt(S_post);
-%Calculating Posterior Mean
+
+%Calculating mean for the posterior
 for i=1:length(test_pnts)
     f(i,1)=normrnd(0,1);
     mean_post(i,1)=q(x(i),x(j));
 end
 
-U=mean_prior+g_star_sharp*(y'-mean_post);
+mu=mean_prior+g_star_sharp*(y'-mean_post);
 
-r_post=U + L_post*f;
-
-e_prior=abs(y'-r_prior);
-e_post=abs(y'-r_post);
+%Monte Carlo Samples for the posterior
+r_post=mu + L_post*f;
 
 
-
+%Generates figure for the input data, prior, and posterior
 figure()
 hold on
-%plot(test_pnts,r_prior,'-o','-r','LineWidth',2.0)
-plot(test_pnts,r_prior,'-o','Color','red')
-errorbar(x,y,d,'o')
+title('Input Data vs Prior vs Posterior')
+ylabel('Output (y)')
+xlabel('Input (x)')
+errorbar(x,y,d,'o','Color','red')
+plot(test_pnts,r_prior,'-o','Color','blue')
 plot(test_pnts,r_post,'-o','Color','green')
-%plot(test_pnts,r_post,'-o','-g','LineWidth',2.0)
+legend('Input data','Prior','Posterior')
 hold off
