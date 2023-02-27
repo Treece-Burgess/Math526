@@ -1,5 +1,13 @@
 clear all;
 
+%Section for arrays to store values
+arr_neg20=zeros();
+arr_neg10=zeros();
+arr_zero=zeros();
+arr_pos10=zeros();
+arr_pos20=zeros();
+pos=[51, 57, 63, 69, 75;];
+
 %Loading in data for problem
 load('streambed_data.mat')
 
@@ -29,27 +37,33 @@ for i=1:length(test_pnts)
 end
 
 %Performing SVD to obtain L for the prior
-[mu,S]=svd(v); 
-L=mu*sqrt(S);
+[U_prior,S]=svd(v); 
+L=U_prior*sqrt(S);
 
 %Calculating mean for the prior
 for i=1:length(test_pnts)
-    f(i,1)=normrnd(0,sqrt(1));
+    %f(i,1)=normrnd(0,sqrt(1));
     mean_prior(i,1)=mean_func(test_pnts(i));
 end
 
-%Monte Carlo Sample for the prior
-r_prior=mean_prior + L * f;
-
-%Generates figure for the input data and prior
 figure()
+n=0;
+while n < 20
+
+for i=1:length(test_pnts)
+    f(i,1)=normrnd(0,sqrt(1));
+end
+r_prior=mean_prior + L*f;
 hold on
+txt = ['Monte Carlo Sample ',num2str(n)];
+plot(test_pnts,r_prior,'DisplayName',txt,'LineWidth',2.0)
+n = n+1;
+end
+errorbar(x,y,d,'o','Color','black','DisplayName','Input Data','LineWidth',2.0)
 title('Input Data vs Prior')
 ylabel('Output (y)')
 xlabel('Input (x)')
-errorbar(x,y,d,'o','Color','red')
-plot(test_pnts,r_prior,'-o','Color','blue')
-legend('Input Data','Prior')
+legend('Location','east')
 hold off
 
 %%Section below is for computing the posterior
@@ -74,24 +88,68 @@ L_post=U_post*sqrt(S_post);
 
 %Calculating mean for the posterior
 for i=1:length(test_pnts)
-    f(i,1)=normrnd(0,1);
-    mean_post(i,1)=q(x(i),x(j));
+    %f(i,1)=normrnd(0,1);
+    mean_post(i,1)=mean_func(x(i));
 end
 
 mu=mean_prior+g_star_sharp*(y'-mean_post);
 
-%Monte Carlo Samples for the posterior
-r_post=mu + L_post*f;
-
-
-%Generates figure for the input data, prior, and posterior
 figure()
+n=0;
+while n < 20
+for i=1:length(test_pnts)
+    f(i,1)=normrnd(0,sqrt(1));
+end
+r_post=mu + L_post*f;
 hold on
-title('Input Data vs Prior vs Posterior')
+txt = ['Monte Carlo Sample ',num2str(n)];
+plot(test_pnts,r_post,'DisplayName',txt,'LineWidth',2.0)
+n = n+1;
+end
+
+errorbar(x,y,d,'o','Color','black','DisplayName','Input Data','LineWidth',2.0)
+title('Input Data vs Posterior')
 ylabel('Output (y)')
 xlabel('Input (x)')
-errorbar(x,y,d,'o','Color','red')
-plot(test_pnts,r_prior,'-o','Color','blue')
-plot(test_pnts,r_post,'-o','Color','green')
-legend('Input data','Prior','Posterior')
+legend('Location','east')
 hold off
+
+%%Number 4
+%Analytic
+x_let=[-20,-10,0,10,20;];
+num_4=[51, 57, 63, 69, 75;];
+for i=1:5
+cdf4(i)=0.5*(1-erf((-10-mu(num_4(i)))/(sqrt(2)*sqrt((L_post(num_4(i),num_4(i)))^2))));
+end
+%Monte Carlo Sampling
+n=1;
+while n < 10001
+for i=1:length(test_pnts)
+    f(i,1)=normrnd(0,sqrt(1));
+end
+r_post=mu + L_post*f;
+arr_neg20(1,n) = r_post(51);
+arr_neg10(1,n) = r_post(57);
+arr_zero(1,n) = r_post(63);
+arr_pos10(1,n) = r_post(69);
+arr_pos20(1,n) = r_post(75);
+n = n + 1;
+end
+
+1/10000 * sum(arr_neg20 > -10)
+1/10000 * sum(arr_neg10 > -10)
+1/10000 * sum(arr_zero > -10)
+1/10000 * sum(arr_pos10 > -10)
+1/10000 * sum(arr_pos20 > -10)
+
+%%Number 5
+arr_simul=zeros();
+for i=1:10000
+    if(arr_neg20(i) > -10 && arr_neg10(i) > -10 && arr_zero(i) > -10 && arr_pos10(i) > -10 && arr_post20(i) > -10)
+        arr_simul(i) = 1;
+    else
+        arr_simul(i) = 0;
+    end
+end
+
+1/10000 * sum(arr_simul)
