@@ -38,21 +38,49 @@
 	
 	\[ h_0(x) := 
 	\begin{cases}
-		-17\exp\left( -\frac{x^2}{1000} \right) & |x| \leq 40 \\
+		-15\exp\left( -\frac{x^2}{1000} \right) & |x| < 40 \\
 		0 & otherwise \\
 	\end{cases}
 	 \]
 	
 		\[ h_1(x) := 
 	\begin{cases}
-		-17 + \frac{1}{100}x^2& |x| \leq 40 \\
+		-15 + \frac{1}{100}x^2& |x| < 40 \\
 		0 & otherwise \\
 	\end{cases}
 	\]
 	
+	Both choices of $h(\cdot)$ were constructed so that the dip in our data $y$ is properly captured by the function along with approximately crossing the $x-$axis at $-40$ and $40$. Since our data "looks" symmetric, we want choices that reflect the symmetry we see. The covariance matrix was picked such that we have cintinuity across our points and to establish dependence of the data on its physical position to other data points. We will also make choices for $\lambda, l$, specifically for our analysis, we will use that $(\lambda, l) \in \{1,2,5\}^2$. Based on the discussion in lecture, we know our posterior is given by
 	
+	\[ f | y_n \sim \mathcal{N}_5 \left( h^{*} +G(y-h^\#), C^{**} - GC^{\#*}\right)\]
+	
+	Where the exponenents $\#, *$ represent input data and test data respectively thus $G:=C^{*\#}(C^{\#\#}+V^{\#\#})^{-1}$. For clarity, note that
+	
+	\[ ((C^{**}))_{i,j} = C(x^*_i, x^*_j)\]
+	\[ ((C^{*\#}))_{i,j} =((C^{\#*}))_{i,j}^T=C(x^*_i, x^\#_j)\]
+	\[((C^{\#\#})_{i,j}=C(x_i,x_j))\]
+	\[((V^{\#\#}))_{i,j}=diag(v_1,...,v_n)\]
+	
+	\newpage
+		
+	\textbf{Section II}
+	
+	In this section, we will use Monte Carlo sampling on our prior and generate 10,000 samples. As stated previously, we use two different choices for $h(\cdot)$ in this section along with using all combinations of ${1,2,5}$ for values of $\lambda,l$. The figures below graph these samples along with the mean over all samples pointwise.
+	
+	\textbf{Section III}
+	
+	In this section, we will use Monte Carlo sampling on our prior and generate 10,000 samples. As stated previously, we use two different choices for $h(\cdot)$ in this section along with using all combinations of ${1,2,5}$ for values of $\lambda,l$. The figures below graph these samples along with the mean over all samples pointwise. These results are summarized graphically below.
+	
+	\begin{figure}[htp]
+		\centering{\includegraphics[scale=0.5]{HW1part3Y.eps}}
+		\label{fig:h0ll1}
+		\caption{}
+		
+		
+	\end{figure}
 
 	
 	
 \end{document}
+
 
