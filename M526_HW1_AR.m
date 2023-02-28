@@ -14,9 +14,11 @@ C_dd=lambda^2*exp(-(x'-x).^2/(2*l^2));
 C_dtp=lambda^2*exp(-(x'-t_p).^2/(2*l^2));
 C_tpd=lambda^2*exp(-(t_p'-x).^2/(2*l^2));
 
-L_pr=chol(C_tptp);
+[V,S,~]=svd(C_tptp);
+L_pr=(V*S^0.5)';
+%L_pr=chol(C_tptp); 
+%Cholesky for 4 & 5 since the matrix is PD
 u_pr=u_func(t_p);
-
 prior=ones(s,1)*u_func(t_p)+normrnd(0,1,s,n)*L_pr;
 
 figure()
@@ -32,7 +34,9 @@ hold off
 G=inv(C_dd+diag(d.^2));
 U_pt=u_func(t_p)+(y-u_func(x))*G'*C_dtp;
 C_pt=C_tptp-C_tpd*G*C_dtp;
-L_pt=chol(C_pt);
+[V,S,~]=svd(C_pt);
+L_pt=(V*S^0.5)';
+%L_pt=chol(C_pt); %Cholesky for 4&5 when the matrix is PD
 post=ones(s,1)*U_pt+normrnd(0,1,s,n)*L_pt;
 
 % figure()
