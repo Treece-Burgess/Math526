@@ -1,4 +1,3 @@
-
 clear all;
 
 load('streambed_data.mat')
@@ -7,7 +6,7 @@ u_func=@(z)(abs(z)<40).*(-15+0.01.*z.^2)+(abs(z)>=40).*(z.*0);%(abs(z)<40).*(-15
 lambda=1;
 l=5;
 n=101;
-s=100000;                         
+s=10000;                         
 t_p=linspace(-100,100,n);
 
 C_tp=lambda^2*exp(-(t_p'-t_p).^2/(2*l^2));
@@ -73,7 +72,8 @@ sigma_alpha=diag(sigma_D);
 
 for i=1:length(alpha)
     cdf4(i)=1-normcdf(-10,u_alpha(i),sigma_alpha(i,i));
-    cdf_4(i)=0.5*(1-erf((-10-u_alpha(i))/(sqrt(2*(sigma_alpha(i,i))^2))));
+    cdf_4(i)=0.5*(1-erf((-10-u_alpha(i))/(sqrt(2)*(sigma_alpha(i,i)))));
+    
 end
 
 I_4=zeros(length(alpha),1);
@@ -87,3 +87,16 @@ for i=1:length(alpha)
     end   
 I_4(i)=(1/s)*sum(mc_4); 
 end
+
+
+cdf_5=mvncdf([-10,-10,-10,-10,-10], u_alpha, sigma_alpha);
+for i=1:s
+    mc_5=zeros(s,1);
+    
+    if (post(i,a) > -10) && (post(i,b) > -10) && (post(i,c) > -10)...
+            && post(i,d) > -10 && post(i,e) > -10
+        mc_5(i)=1;
+    else
+    end  
+end
+I_5=(1/s)*sum(mc_5);
