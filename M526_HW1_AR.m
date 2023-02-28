@@ -1,8 +1,9 @@
+
 clear all;
 
 load('streambed_data.mat')
 
-u_func=@(z)(abs(z)<40).*(-15*exp(-(1/900)*z.^2))+(abs(z)>=40).*(z.*0); %mean(y)*z.^0;%(abs(z)<40).*(-15+0.01.*z.^2)+(abs(z)>=40).*(z.*0); %(abs(z)<40).*(-17*cos((z.*pi)./80))+(abs(z)>=40).*(0); 
+u_func=@(z)(abs(z)<40).*(-15+0.01.*z.^2)+(abs(z)>=40).*(z.*0);%(abs(z)<40).*(-15*exp(-(1/900)*z.^2))+(abs(z)>=40).*(z.*0); %mean(y)*z.^0;% %(abs(z)<40).*(-17*cos((z.*pi)./80))+(abs(z)>=40).*(0); 
 lambda=1;
 l=5;
 n=101;
@@ -45,17 +46,17 @@ post=ones(s,1)*U_pt+normrnd(0,1,s,n)*L_pt;
 % xlabel('Input (x)')
 % hold off
 % 
-figure()
-hold on
-plot(t_p,prior, 'Color', "#888c89",'LineWidth',0.25)
-plot(t_p,mean(prior), 'Color','m','LineWidth',0.25)
-plot(t_p,post, 'Color', 'y', 'LineWidth', 0.25)
-plot(t_p,mean(post), 'Color', 'r', 'LineWidth', 0.25)
-errorbar(x,y,d,'o','Color','black','LineWidth',1.5)
-title('Input Data with Prior and Posterior')
-ylabel('Output (y)')
-xlabel('Input (x)')
-hold off
+% figure()
+% hold on
+% plot(t_p,prior, 'Color', "#888c89",'LineWidth',0.25)
+% plot(t_p,mean(prior), 'Color','m','LineWidth',0.25)
+% plot(t_p,post, 'Color', 'y', 'LineWidth', 0.25)
+% plot(t_p,mean(post), 'Color', 'r', 'LineWidth', 0.25)
+% errorbar(x,y,d,'o','Color','black','LineWidth',1.5)
+% title('Input Data with Prior and Posterior')
+% ylabel('Output (y)')
+% xlabel('Input (x)')
+% hold off
 
 % Part 4 and 5
 a = find(t_p == -20);
@@ -64,6 +65,17 @@ c = find(t_p == 0);
 d = find(t_p == 10);
 e = find(t_p == 20);
 alpha = [a, b, c, d, e;];
+
+x_alpha=[-20, -10, 0, 10, 20];
+u_alpha=[U_pt(a),U_pt(b),U_pt(c),U_pt(d),U_pt(e)];
+sigma_D=[L_pt(a,a),L_pt(b,b),L_pt(c,c),L_pt(d,d),L_pt(e,e)];
+sigma_alpha=diag(sigma_D);
+
+for i=1:length(alpha)
+    cdf4(i)=1-normcdf(-10,u_alpha(i),sigma_alpha(i,i));
+    cdf_4(i)=0.5*(1-erf((-10-u_alpha(i))/(sqrt(2*(sigma_alpha(i,i))^2))));
+end
+
 I_4=zeros(length(alpha),1);
 for i=1:length(alpha)
     mc_4=zeros(s,1);
@@ -75,5 +87,3 @@ for i=1:length(alpha)
     end   
 I_4(i)=(1/s)*sum(mc_4); 
 end
-
-
