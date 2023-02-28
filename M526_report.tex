@@ -1,0 +1,58 @@
+\documentclass[12pt,leqno]{article}
+\setlength{\topmargin}{0.0in}
+\setlength{\oddsidemargin}{.35in}
+%\setlength{\evensidemargin}{.25in}
+\setlength{\textwidth}{6.0in}
+\setlength{\textheight}{9.50in}
+\renewcommand{\baselinestretch}{1.00}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\DeclareMathOperator{\erfc}{erfc}
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+%\pagestyle{empty}
+
+\markright{Math 526, Report 1}
+
+\begin{document}
+	
+	\textbf{\large{Math 526} \hspace{0.5in}  \large{Assignment Report 1}}  \hspace{0.5in}  Anthony Ramirez
+	
+	\vspace{.25in}
+	
+	\textbf{\underline{Problem 1:}}
+	For this problem, we were given a data set $streambed\_data.mat$ which contains measurements of depth $y$, at position $x$ with $d$, the standard deviation of each depth measurement. We were asked to formulate a Bayesian model employing a Guassian process to estimate the depth profile for this data. We then will use Monte Carlo sampling to characterize our prior and posterior depth profiles. Finally we will compute posterior probabilities that certain points along our cross section have a depth less than 10 feet.
+	
+	\textbf{Section I}
+	
+	For this section, we will formulate a model to estimate the depth rofile along the channel's cross-section. Our model is given as
+	
+	\[ f(\cdot) \sim GP\left( h(\cdot), C(\cdot,\cdot) \right) \]
+	\[ y_n | f(\cdot) \sim \mathcal{N}(f(x_n),v_n) \]
+	
+	where $v_n=d_n^2$ from our data set and we choose $C(x_i,x_j):=\lambda^2 \exp\left( \frac{-(x_i-x_j)^2}{2l^2}\right)$. Since we can choose $h(\cdot)$, we will perform our analysis on two different choices for $h(\cdot)$ given as follows
+	
+	\[ h_0(x) := 
+	\begin{cases}
+		-17\exp\left( -\frac{x^2}{1000} \right) & |x| \leq 40 \\
+		0 & otherwise \\
+	\end{cases}
+	 \]
+	
+		\[ h_1(x) := 
+	\begin{cases}
+		-17 + \frac{1}{100}x^2& |x| \leq 40 \\
+		0 & otherwise \\
+	\end{cases}
+	\]
+	
+	
+
+	
+	
+\end{document}
+
